@@ -28,9 +28,11 @@ content:
     type: collection
     path: content/news
     format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
     fields:
       - { name: title, label: タイトル, type: string, required: true }
-      - { name: date, label: 掲載日, type: date, required: true }
+      - { name: date, label: 掲載日, type: date, required: true, options: { format: yyyy-MM-dd } }
       - { name: body, label: 本文, type: text }
       - { name: published, label: 公開する, type: boolean }
   - name: games
@@ -38,9 +40,11 @@ content:
     type: collection
     path: content/games
     format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
     fields:
       - { name: title, label: 大会名・試合名, type: string, required: true }
-      - { name: date, label: 試合日, type: date, required: true }
+      - { name: date, label: 試合日, type: date, required: true, options: { format: yyyy-MM-dd } }
       - { name: opponent, label: 対戦相手, type: string }
       - { name: score, label: スコア（例 3-2）, type: string }
       - { name: body, label: コメント, type: text }
@@ -50,9 +54,11 @@ content:
     type: collection
     path: content/schedule
     format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
     fields:
       - { name: title, label: 予定名, type: string, required: true }
-      - { name: date, label: 日付, type: date, required: true }
+      - { name: date, label: 日付, type: date, required: true, options: { format: yyyy-MM-dd } }
       - { name: location, label: 場所（公開してよい範囲）, type: string }
       - { name: body, label: 詳細, type: text }
       - { name: published, label: 公開する, type: boolean }
@@ -61,9 +67,11 @@ content:
     type: collection
     path: content/gallery
     format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
     fields:
       - { name: title, label: 写真のタイトル, type: string, required: true }
-      - { name: date, label: 撮影日, type: date }
+      - { name: date, label: 撮影日, type: date, options: { format: yyyy-MM-dd } }
       - { name: image, label: 写真（掲載許可を確認）, type: image, required: true }
       - { name: alt, label: 写真の説明, type: string }
       - { name: published, label: 公開する, type: boolean }
