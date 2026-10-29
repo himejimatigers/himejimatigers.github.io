@@ -1,0 +1,69 @@
+media:
+  input: media
+  output: /media
+content:
+  - name: settings
+    label: トップページ・募集案内
+    type: file
+    path: content/settings.json
+    format: json
+    fields:
+      - { name: headline, label: キャッチコピー, type: string, required: true }
+      - { name: growth_title, label: 04の見出し, type: string }
+      - { name: growth_body, label: 04の本文, type: text }
+      - { name: description, label: チーム紹介文, type: text }
+      - { name: recruitment, label: 募集メッセージ, type: string }
+      - { name: recruitment_title, label: 募集見出し, type: string }
+      - { name: recruitment_body, label: 募集本文, type: text }
+      - { name: recruitment_note, label: 体験案内の一言, type: text }
+      - { name: instagram, label: InstagramのURL, type: string }
+      - { name: location, label: 活動エリア, type: string }
+      - { name: schedule_note, label: 練習日時の案内, type: text }
+      - { name: equipment, label: 体験時の持ち物, type: text }
+      - { name: rental, label: 道具の貸出, type: string }
+      - { name: trial_fee, label: 体験費用, type: string }
+      - { name: fee_note, label: 費用・持ち物の案内, type: text }
+  - name: news
+    label: お知らせ
+    type: collection
+    path: content/news
+    format: json
+    fields:
+      - { name: title, label: タイトル, type: string, required: true }
+      - { name: date, label: 掲載日, type: date, required: true }
+      - { name: body, label: 本文, type: text }
+      - { name: published, label: 公開する, type: boolean }
+  - name: games
+    label: 試合結果
+    type: collection
+    path: content/games
+    format: json
+    fields:
+      - { name: title, label: 大会名・試合名, type: string, required: true }
+      - { name: date, label: 試合日, type: date, required: true }
+      - { name: opponent, label: 対戦相手, type: string }
+      - { name: score, label: スコア（例 3-2）, type: string }
+      - { name: body, label: コメント, type: text }
+      - { name: published, label: 公開する, type: boolean }
+  - name: schedule
+    label: 活動スケジュール
+    type: collection
+    path: content/schedule
+    format: json
+    fields:
+      - { name: title, label: 予定名, type: string, required: true }
+      - { name: date, label: 日付, type: date, required: true }
+      - { name: location, label: 場所（公開してよい範囲）, type: string }
+      - { name: body, label: 詳細, type: text }
+      - { name: published, label: 公開する, type: boolean }
+  - name: gallery
+    label: 写真ギャラリー
+    type: collection
+    path: content/gallery
+    format: json
+    fields:
+      - { name: title, label: 写真のタイトル, type: string, required: true }
+      - { name: date, label: 撮影日, type: date }
+      - { name: image, label: 写真（掲載許可を確認）, type: image, required: true }
+      - { name: alt, label: 写真の説明, type: string }
+      - { name: published, label: 公開する, type: boolean }
