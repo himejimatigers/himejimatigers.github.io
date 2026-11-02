@@ -18,11 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Build website
-        run: python build.py
+      # 完成版のHTMLをそのまま公開するため、build.py による index.html の再生成は行わない
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
