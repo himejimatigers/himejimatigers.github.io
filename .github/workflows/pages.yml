@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # 毎日 0:05（日本時間）に作り直し、日付を過ぎた活動予定を表示から外す
+    - cron: '5 15 * * *'
 permissions:
   contents: read
   pages: write
@@ -18,10 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # 完成版のHTMLをそのまま公開するため、build.py による index.html の再生成は行わない
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # 大きな写真を公開用に縮小するためだけに使う（無くてもページは作れる）
+      - name: Install Pillow
+        run: pip install Pillow==11.1.0 || echo "Pillow could not be installed; large photos will be used as-is"
+      # content/ のデータを site-src/templates/ の完成版デザインに差し込んで _site/ を作る
+      - name: Build website
+        run: python site-src/build.py _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

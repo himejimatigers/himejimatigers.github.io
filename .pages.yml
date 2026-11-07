@@ -1,28 +1,117 @@
+# Pages CMS 設定（管理画面の項目）  https://pagescms.org/docs/configuration/
+# 管理画面で保存 → GitHub Actions が site-src/build.py でページを組み立てて自動公開します。
+# デザインは site-src/templates/ にある完成版のまま変わりません。
+
 media:
   input: media
   output: /media
+  categories: [image]
+  extensions: [jpg, jpeg, png, webp, gif]
+  rename: random
+
 content:
-  - name: settings
-    label: トップページ・募集案内
+  # ------------------------------------------------------------ サイト全体の文章
+  - name: site
+    label: チーム紹介・方針・募集案内
     type: file
-    path: content/settings.json
+    path: content/site.json
     format: json
     fields:
-      - { name: headline, label: キャッチコピー, type: string, required: true }
-      - { name: growth_title, label: 04の見出し, type: string }
-      - { name: growth_body, label: 04の本文, type: text }
-      - { name: description, label: チーム紹介文, type: text }
-      - { name: recruitment, label: 募集メッセージ, type: string }
-      - { name: recruitment_title, label: 募集見出し, type: string }
-      - { name: recruitment_body, label: 募集本文, type: text }
-      - { name: recruitment_note, label: 体験案内の一言, type: text }
-      - { name: instagram, label: InstagramのURL, type: string }
-      - { name: location, label: 活動エリア, type: string }
-      - { name: schedule_note, label: 練習日時の案内, type: text }
-      - { name: equipment, label: 体験時の持ち物, type: text }
-      - { name: rental, label: 道具の貸出, type: string }
-      - { name: trial_fee, label: 体験費用, type: string }
-      - { name: fee_note, label: 費用・持ち物の案内, type: text }
+      - name: about
+        label: チーム紹介（ABOUT）
+        type: object
+        fields:
+          - { name: description, label: チーム紹介文, type: text, required: true }
+          - { name: area, label: 活動エリア, type: string }
+          - { name: target, label: 対象, type: string }
+      - name: policies
+        label: チーム方針（01〜）
+        description: 番号（01、02…）は上から順に自動で付きます。
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - { name: title, label: 見出し, type: string, required: true }
+          - { name: text, label: 説明, type: text }
+      - { name: staff_lead, label: スタッフ紹介の説明文, type: text }
+      - name: schedule_note
+        label: 活動スケジュールの案内文
+        description: スケジュール欄の下に小さく表示されます。
+        type: text
+      - name: contact
+        label: 募集メッセージ（JOIN OUR TEAM）
+        type: object
+        fields:
+          - { name: title, label: 見出し, type: string }
+          - { name: lead, label: リード文, type: string }
+          - { name: body, label: 本文（改行がそのまま表示されます）, type: text }
+      - name: requirements
+        label: 募集要項・無料体験のご案内
+        type: object
+        fields:
+          - { name: title, label: 見出し, type: string }
+          - { name: lead, label: 説明文, type: string }
+          - name: items
+            label: 項目
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{label}"
+            fields:
+              - { name: label, label: 項目名, type: string, required: true }
+              - { name: value, label: 内容, type: string }
+      - name: notes
+        label: ページ下部の注意書き
+        type: string
+        list: true
+      - name: instagram_url
+        label: InstagramのURL
+        description: ボタンや固定バナーのリンク先がすべてこのURLになります。
+        type: string
+        required: true
+        pattern:
+          regex: "^https://"
+          message: https:// から始まるURLを入れてください
+      - { name: footer_text, label: フッターの紹介文, type: string }
+
+  # ------------------------------------------------------------ スタッフ
+  - name: staff
+    label: スタッフ紹介
+    type: collection
+    path: content/staff
+    format: json
+    filename: "{year}{month}{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
+    view:
+      fields: [order, role, name, published]
+      primary: role
+      sort: order
+      order: asc
+    fields:
+      - name: order
+        label: 表示順
+        description: 小さい数字ほど前に表示されます（例：10、20、30）。トップページには先頭の3人が出ます。
+        type: number
+        default: 100
+      - { name: role, label: 役職, type: string, required: true }
+      - name: name
+        label: 名前
+        description: 空欄の場合は「名前は準備中」と表示されます。
+        type: string
+      - name: comment
+        label: 紹介コメント
+        description: 空欄の場合は「紹介コメントは準備中です。」と表示されます。
+        type: text
+      - name: photo
+        label: 写真
+        description: 本人の了解を得た写真だけを使ってください。空欄の場合は「PHOTO COMING SOON」と表示されます。
+        type: image
+      - { name: published, label: 公開する, type: boolean, default: true }
+
+  # ------------------------------------------------------------ お知らせ
   - name: news
     label: お知らせ
     type: collection
@@ -30,25 +119,18 @@ content:
     format: json
     filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
     exclude: [.gitkeep]
+    view:
+      fields: [title, date, published]
+      primary: title
+      sort: date
+      order: desc
     fields:
       - { name: title, label: タイトル, type: string, required: true }
       - { name: date, label: 掲載日, type: date, required: true, options: { format: yyyy-MM-dd } }
-      - { name: body, label: 本文, type: text }
-      - { name: published, label: 公開する, type: boolean }
-  - name: games
-    label: 試合結果
-    type: collection
-    path: content/games
-    format: json
-    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
-    exclude: [.gitkeep]
-    fields:
-      - { name: title, label: 大会名・試合名, type: string, required: true }
-      - { name: date, label: 試合日, type: date, required: true, options: { format: yyyy-MM-dd } }
-      - { name: opponent, label: 対戦相手, type: string }
-      - { name: score, label: スコア（例 3-2）, type: string }
-      - { name: body, label: コメント, type: text }
-      - { name: published, label: 公開する, type: boolean }
+      - { name: body, label: 本文（改行がそのまま表示されます）, type: text }
+      - { name: published, label: 公開する, type: boolean, default: true }
+
+  # ------------------------------------------------------------ 活動スケジュール
   - name: schedule
     label: 活動スケジュール
     type: collection
@@ -56,22 +138,106 @@ content:
     format: json
     filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
     exclude: [.gitkeep]
+    view:
+      fields: [title, date, published]
+      primary: title
+      sort: date
+      order: desc
     fields:
       - { name: title, label: 予定名, type: string, required: true }
-      - { name: date, label: 日付, type: date, required: true, options: { format: yyyy-MM-dd } }
-      - { name: location, label: 場所（公開してよい範囲）, type: string }
-      - { name: body, label: 詳細, type: text }
-      - { name: published, label: 公開する, type: boolean }
+      - name: date
+        label: 日付
+        description: 日付を過ぎた予定は、翌日以降のサイト更新で自動的に表示されなくなります。
+        type: date
+        required: true
+        options: { format: yyyy-MM-dd }
+      - { name: time, label: 時間（任意。例 9:00〜12:00）, type: string }
+      - { name: location, label: 場所（公開してよい範囲で）, type: string }
+      - { name: body, label: 詳細（改行がそのまま表示されます）, type: text }
+      - { name: published, label: 公開する, type: boolean, default: true }
+
+  # ------------------------------------------------------------ 試合結果
+  - name: games
+    label: 試合結果
+    type: collection
+    path: content/games
+    format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    exclude: [.gitkeep]
+    view:
+      fields: [title, date, published]
+      primary: title
+      sort: date
+      order: desc
+    fields:
+      - { name: title, label: 大会名・試合名, type: string, required: true }
+      - name: date
+        label: 試合日
+        description: 新しい試合ほど上に表示されます（画面には表示されません）。
+        type: date
+        options: { format: yyyy-MM-dd }
+      - name: top
+        label: 先攻チーム（上の段）
+        type: object
+        fields:
+          - { name: name, label: チーム名, type: string, required: true }
+          - name: innings
+            label: 各回の得点
+            description: 1回から順にカンマ区切りで入力（例：0, 1, 0, 3）。サヨナラの回は数字の後ろに x（例：1x）。
+            type: string
+      - name: bottom
+        label: 後攻チーム（下の段）
+        type: object
+        fields:
+          - { name: name, label: チーム名, type: string, required: true }
+          - name: innings
+            label: 各回の得点
+            description: 1回から順にカンマ区切りで入力（例：2, 0, 2, 1x）。合計は自動で計算されます。
+            type: string
+      - name: result_label
+        label: 結果の表示（例：コールド勝ち、サヨナラ負け、勝ち）
+        type: string
+      - name: note
+        label: 補足（「※」は自動で付きます）
+        type: text
+      - name: status
+        label: 試合の状態
+        description: 「● 試合終了」のように表示されます。
+        type: string
+        default: 試合終了
+      - name: order
+        label: 表示順（試合日が空欄の試合だけに使います）
+        type: number
+        default: 100
+      - name: caption
+        label: 読み上げ用の説明（任意・画面には表示されません）
+        description: 空欄の場合は自動で作られます。
+        type: text
+      - name: table_label
+        label: 表の読み上げ名（任意・画面には表示されません）
+        type: string
+      - { name: published, label: 公開する, type: boolean, default: true }
+
+  # ------------------------------------------------------------ フォトギャラリー
   - name: gallery
-    label: 写真ギャラリー
+    label: フォトギャラリー
     type: collection
     path: content/gallery
     format: json
     filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
     exclude: [.gitkeep]
+    view:
+      fields: [title, date, published]
+      primary: title
+      sort: date
+      order: desc
     fields:
-      - { name: title, label: 写真のタイトル, type: string, required: true }
+      - name: image
+        label: 写真
+        description: 写っている子どもの保護者から掲載許可を得た写真だけを使ってください。写真はGitHub上で誰でも見られる場所に保存されます。
+        type: image
+        required: true
+      - { name: title, label: 写真の説明（写真の下に表示）, type: string }
       - { name: date, label: 撮影日, type: date, options: { format: yyyy-MM-dd } }
-      - { name: image, label: 写真（掲載許可を確認）, type: image, required: true }
-      - { name: alt, label: 写真の説明, type: string }
-      - { name: published, label: 公開する, type: boolean }
+      - { name: alt, label: 読み上げ用の説明（任意）, type: string }
+      - { name: published, label: 公開する, type: boolean, default: true }
